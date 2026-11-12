@@ -1,15 +1,110 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Joel Webbon for Governor</title>
   <style>
-    body { margin: 0; background: black; }
-    video { width: 100%; height: 100vh; object-fit: contain; }
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    #soundButton {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 15px 25px;
+      background: white;
+      color: black;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    #soundButton:hover {
+      background: #ddd;
+    }
   </style>
 </head>
 <body>
-  <video autoplay muted playsinline controls>
+
+  <video id="video" playsinline controls>
     <source src="video.mp4" type="video/mp4">
+    Your browser does not support HTML5 video.
   </video>
+
+  <button id="soundButton">🔊 Enable Sound</button>
+
+  <script>
+    const video = document.getElementById('video');
+    const button = document.getElementById('soundButton');
+
+    async function startVideo() {
+      // First attempt: autoplay with sound
+      video.muted = false;
+      video.volume = 1;
+
+      try {
+        await video.play();
+        // Success! Sound is allowed.
+        button.style.display = 'none';
+      } catch (error) {
+        // Browser blocked sound autoplay.
+        // Fall back to muted autoplay.
+        video.muted = true;
+
+        try {
+          await video.play();
+          button.style.display = 'block';
+        } catch (mutedError) {
+          // Browser blocked autoplay entirely.
+          // Let the user start playback manually.
+          button.textContent = '▶ Play Video';
+          button.style.display = 'block';
+        }
+      }
+    }
+
+    button.addEventListener('click', async () => {
+      video.muted = false;
+      video.volume = 1;
+
+      try {
+        await video.play();
+        button.style.display = 'none';
+      } catch (error) {
+        button.textContent = '▶ Play Video';
+      }
+    });
+
+    // Hide the sound button if the user
+    // manually unmutes using video controls.
+    video.addEventListener('volumechange', () => {
+      if (!video.muted && video.volume > 0) {
+        button.style.display = 'none';
+      }
+    });
+
+    startVideo();
+  </script>
+
 </body>
 </html>
